@@ -39,7 +39,7 @@ public class JdPageProcessor implements PageProcessor {
 
         List<String> urls = page.getHtml()
                 .links()
-                .regex("https://search\\.jd\\.com/Search?keyword=iphone12&wq=iphone12&page=(\\d)&s=(\\d+)&click=(\\d)")
+                .regex("https://search\\.jd\\.com/Search\\?keyword=iphone12&wq=iphone12&page=\\d&s=[0-9][0-9]*&click=\\d")
                 .all();
         log.info("urls:{}", JSON.toJSONString(urls));
 
