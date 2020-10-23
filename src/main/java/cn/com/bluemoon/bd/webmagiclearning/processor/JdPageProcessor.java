@@ -39,11 +39,10 @@ public class JdPageProcessor implements PageProcessor {
 
         List<String> urls = page.getHtml()
                 .links()
-                .regex("https://search\\.jd\\.com/Search\\?keyword=iphone12&wq=iphone12&page=\\d&s=[0-9][0-9]*&click=\\d")
+                .regex("(https://search\\.jd\\.com/Search\\?keyword=iphone12&wq=iphone12&page=\\d&s=\\d{1,3}&click=\\d)")
                 .all();
         log.info("urls:{}", JSON.toJSONString(urls));
-
-        page.addTargetRequests(urls);
+        //page.addTargetRequests(urls);
     }
 
     @Override
@@ -58,5 +57,6 @@ public class JdPageProcessor implements PageProcessor {
                 .addPipeline(new ConsolePipeline())
                 .thread(3)
                 .run();
+        
     }
 }
