@@ -8,7 +8,9 @@ import us.codecraft.webmagic.Spider;
 import us.codecraft.webmagic.pipeline.ConsolePipeline;
 import us.codecraft.webmagic.processor.PageProcessor;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
 
 /**
  * <b><code>JdPageProcessor</code></b>
@@ -23,9 +25,13 @@ import java.util.List;
 @Slf4j
 public class JdPageProcessor implements PageProcessor {
 
-    private Site site = Site.me()
+    private final Site site = Site.me()
+            .setDomain("www.search.jd.com")
             .setRetryTimes(3)
             .setSleepTime(100);
+
+    private static final String JD_URL = "https://search.jd.com/Search?keyword=iphone12&wq=iphone12";
+    private static final String CONCATENATION = "&page=";
 
     @Override
     public void process(Page page) {
@@ -37,12 +43,16 @@ public class JdPageProcessor implements PageProcessor {
                 page.getHtml()
                         .xpath("//div[@id='J_goodsList']/ul/li/div/div[3]/strong/i/text()").all());
 
-        List<String> urls = page.getHtml()
-                .links()
-                .regex("(https://search\\.jd\\.com/Search\\?keyword=iphone12&wq=iphone12&page=\\d&s=\\d{1,3}&click=\\d)")
-                .all();
-        log.info("urls:{}", JSON.toJSONString(urls));
-        //page.addTargetRequests(urls);
+        String pageSize = page.getHtml()
+                .xpath("//span[@class='p-skip']/em/b/text()").get();
+        log.info("pageSize:{}", pageSize);
+
+        List<String> pageUrls = new ArrayList<>();
+        IntStream.range(2, 6)
+                .forEach(i -> pageUrls.add(JdPageProcessor.JD_URL + JdPageProcessor.CONCATENATION + i));
+        log.info("pageUrls:{}", JSON.toJSONString(pageUrls));
+
+        page.addTargetRequests(pageUrls);
     }
 
     @Override
@@ -53,10 +63,10 @@ public class JdPageProcessor implements PageProcessor {
     public static void main(String[] args) {
 
         Spider.create(new JdPageProcessor())
-                .addUrl("https://search.jd.com/Search?keyword=iphone12&wq=iphone12")
+                .addUrl(JdPageProcessor.JD_URL)
                 .addPipeline(new ConsolePipeline())
                 .thread(3)
                 .run();
-        
+
     }
 }
