@@ -1,2 +1,2 @@
 # webmagic-learning
-webmagic-framework-pracitice
+webmagic-framework-practice
